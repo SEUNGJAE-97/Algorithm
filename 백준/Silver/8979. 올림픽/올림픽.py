@@ -1,3 +1,4 @@
+
 def main():
     N, K = map(int, input().split())
     medal = [list(map(int, input().split())) for _ in range(N)]
@@ -6,8 +7,10 @@ def main():
 
     index = [medal[i][0] for i in range(N)].index(K)
 
-    print(index)
-
+    for i in range(N):
+        if medal[index][1:] == medal[i][1:]:
+            print(i + 1)
+            break
 
 
 if __name__ == '__main__':
