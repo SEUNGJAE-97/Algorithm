@@ -36,6 +36,7 @@ public class Solution {
 			}
 			// 구현
 			calc(arr);
+			//?
 			String result = arr.stream().map(String::valueOf).collect(Collectors.joining(""));
 			// System.out.println(testArr[0]+testArr[1]);
 			sb.append(result).append("\n");
