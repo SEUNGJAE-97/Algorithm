@@ -2,89 +2,93 @@ import java.io.*;
 import java.util.*;
 
 public class Solution {
-    private static int T, V, E;
-    private static Edge[] edgeList;
-    private static int[] parents; 
+	private static int V, E, T;
+	private static List<Node>[] adjList;
+	private static int[] Edge;
+	private static boolean[] Visited;
 
-    private static class Edge implements Comparable<Edge> {
-        int from, to;
-        long weight;
+	private static class Node implements Comparable<Node> {
+		public int vertex;
+		public int weight;
 
-        public Edge(int from, int to, int weight) {
-            this.from = from;
-            this.to = to;
-            this.weight = weight;
-        }
+		public Node(int vertex, int weight) {
+			super();
+			this.vertex = vertex;
+			this.weight = weight;
+		}
 
-        @Override
-        public int compareTo(Edge o) {
-        	return Long.compare(this.weight, o.weight); 
-        }
-    }
+		@Override
+		public int compareTo(Node o) {
+			// TODO Auto-generated method stub
+			return Integer.compare(this.weight, o.weight);
+		}
 
-    private static void makeSet() {
-        parents = new int[V + 1];
-        for (int i = 1; i <= V; i++) {
-            parents[i] = i;
-        }
-    }
+	}
 
-    private static int findSet(int a) {
-        if (parents[a] == a) return a;
-        return parents[a] = findSet(parents[a]);
-    }
+	public static void main(String[] args) throws Exception {
+		//System.setIn(new FileInputStream("sample_input.txt"));
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringBuilder sb = new StringBuilder();
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 
-    private static boolean union(int a, int b) {
-        int aRoot = findSet(a);
-        int bRoot = findSet(b);
-        if (aRoot == bRoot) return false;
-        parents[bRoot] = aRoot;
-        return true;
-    }
+		T = Integer.parseInt(st.nextToken());
 
-    public static void main(String[] args) throws Exception {
-        //System.setIn(new FileInputStream("sample_input.txt"));
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb = new StringBuilder();
+		for (int tc = 1; tc <= T; tc++) {
+			st = new StringTokenizer(br.readLine());
+			// 간선, 정점 개수 입력
+			V = Integer.parseInt(st.nextToken());
+			E = Integer.parseInt(st.nextToken());
 
-        T = Integer.parseInt(br.readLine().trim());
-        for (int tc = 1; tc <= T; tc++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            V = Integer.parseInt(st.nextToken());
-            E = Integer.parseInt(st.nextToken());
+			adjList = new ArrayList[V];
+			for (int i = 0; i < V; i++) {
+				adjList[i] = new ArrayList<>();
+			}
 
-            if (E == 0) {  // 간선이 아예 없을 때
-                sb.append("#").append(tc).append(" ").append(0).append("\n");
-                continue;
-            }
+			Edge = new int[V];
+			Visited = new boolean[V];
 
-            edgeList = new Edge[E];
-            for (int i = 0; i < E; i++) {
-                st = new StringTokenizer(br.readLine());
-                int from = Integer.parseInt(st.nextToken());
-                int to = Integer.parseInt(st.nextToken());
-                int weight = Integer.parseInt(st.nextToken());
-                edgeList[i] = new Edge(from, to, weight);
-            }
+			for (int i = 0; i < E; i++) {
+				st = new StringTokenizer(br.readLine(), " ");
+				int from = Integer.parseInt(st.nextToken())-1;
+				int to = Integer.parseInt(st.nextToken())-1;
+				int weight = Integer.parseInt(st.nextToken());
 
-            Arrays.sort(edgeList);
-            makeSet();
+				adjList[from].add(new Node(to, weight));
+				adjList[to].add(new Node(from, weight));
+			}
 
-            long result = 0L;
-            int count = 0;
-            for (Edge edge : edgeList) {
-                if (union(edge.from, edge.to)) {
-                    result += edge.weight;
-                    if (++count == V - 1) break;
-                }
-            }
+			Arrays.fill(Edge, Integer.MAX_VALUE);
 
-            if (count < V - 1) {
-                sb.append("#").append(tc).append(" ").append(-1).append("\n"); // MST 불가능한 경우
-            } else {
-                sb.append("#").append(tc).append(" ").append(result).append("\n");
-            }
-        }
-        System.out.println(sb);
-    }
+			// 구현
+			Edge[0] = 0;
+			long cost = 0;
+			int vertexCount = 0;
+			PriorityQueue<Node> pq = new PriorityQueue<>();
+			pq.add(new Node(0, 0));
+
+			while (!pq.isEmpty()) {
+				Node current = pq.poll();
+				if(Visited[current.vertex]) continue;
+				int v = current.vertex;
+				int w = current.weight;
+
+				if (Visited[v])
+					continue;
+				Visited[v] = true;
+				cost += w;
+
+				if (++vertexCount == V) {
+					break;
+				}
+
+				for (Node next : adjList[v]) {
+					if (!Visited[next.vertex]) {
+						pq.add(new Node(next.vertex, next.weight));
+					}
+				}
+			}
+			sb.append("#").append(tc).append(" ").append(cost).append("\n");
+		}
+		System.out.println(sb);
+	}
 }
